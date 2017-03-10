@@ -10,7 +10,7 @@ void setup() {
   // Setup Serial
   while (!Serial);
   delay(1000);
-  Serial.begin(9600);
+  Serial.begin(115200);
 }
 
 int read_humidity_sensor() {
