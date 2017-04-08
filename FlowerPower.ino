@@ -3,13 +3,12 @@
 #include <LiquidCrystal_I2C.h> // https://bitbucket.org/fmalpartida/new-liquidcrystal/downloads
 
 // YL-39 + YL-69 humidity sensor
-static const int humidity_sensor_pin = A1;
-static const int humidity_sensor_vcc = 19;
-static const int humidity_sensor_gnd = 17;
+static const int humidity_sensor_pin = A3;
+static const int humidity_sensor_vcc = 13;
+static const int humidity_sensor_gnd = 15;
 static const int btn_pin = 12;
 static const int btn_gnd = 10;
 static const int relayPin1 = 3;
-static const int test_led = 13;
 static const int lcd_vcc = 8;
 static const int lcd_gnd = 6;
 static const long windowSize = 60000;
@@ -42,7 +41,6 @@ void setup() {
     pinMode(humidity_sensor_pin, INPUT);
     pinMode(humidity_sensor_vcc, OUTPUT);
     pinMode(humidity_sensor_gnd, OUTPUT);
-    pinMode(test_led, OUTPUT);
     pinMode(relayPin1, OUTPUT);
     pinMode(btn_pin, INPUT_PULLUP);
     pinMode(btn_gnd, OUTPUT);
@@ -53,7 +51,6 @@ void setup() {
     digitalWrite(humidity_sensor_gnd, LOW);
     digitalWrite(relayPin1, LOW);
     digitalWrite(btn_gnd, LOW);
-    digitalWrite(test_led, LOW);
     digitalWrite(lcd_vcc, HIGH);
     digitalWrite(lcd_gnd, LOW);
 
@@ -110,9 +107,9 @@ void loop() {
     Serial.println(sensorVal);
 
     if (sensorVal == HIGH) {
-        digitalWrite(test_led, LOW);
+        //digitalWrite(test_led, LOW);
     } else {
-        digitalWrite(test_led, HIGH);
+        //digitalWrite(test_led, HIGH);
     }
    
     // take N samples in a row, with a slight delay
