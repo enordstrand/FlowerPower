@@ -14,7 +14,7 @@ static const int lcd_gnd = 6;
 static const long windowSize = 60000;
 
 double setpoint1, input1, output1;
-double kp=2000, ki=0, kd=0;
+double kp = 2000, ki = 0, kd = 0;
 long now, windowStartTime;
 long counter = 0;
 double sensorValue1 = 0;
@@ -66,17 +66,17 @@ void pushButtonLogic() {
 }
 
 void printSerialToLCD() {
-  // when characters arrive over the serial port...
+    // when characters arrive over the serial port...
     if (Serial.available()) {
-      // wait a bit for the entire message to arrive
-      delay(100);
-      // clear the screen
-      lcd.clear();
-      // read all the available characters
-      while (Serial.available() > 0) {
-        // display each character to the LCD
-        lcd.write(Serial.read());
-      }
+        // wait a bit for the entire message to arrive
+        delay(100);
+        // clear the screen
+        lcd.clear();
+        // read all the available characters
+        while (Serial.available() > 0) {
+            // display each character to the LCD
+            lcd.write(Serial.read());
+        }
     }
 }
 
@@ -99,20 +99,20 @@ void setupSerial() {
 void readAverageHumidity() {
     uint8_t i;
     float averageAnalogRead_1;
-  
+
     // take N samples in a row, with a slight delay
     //digitalWrite(humidity_sensor_vcc, HIGH);
     //delay(500);
-    for (i=0; i< numberOfSamples; i++) {
-       samples1[i] = read_humidity_sensor();
-//     delay(10);
+    for (i = 0; i < numberOfSamples; i++) {
+        samples1[i] = read_humidity_sensor();
+        // delay(10);
     }
     //digitalWrite(humidity_sensor_vcc, LOW);
 
     // average all the samples out
     averageAnalogRead_1 = 0;
-    for (i=0; i< numberOfSamples; i++) {
-       averageAnalogRead_1 += samples1[i];
+    for (i = 0; i < numberOfSamples; i++) {
+        averageAnalogRead_1 += samples1[i];
     }
     averageAnalogRead_1 /= numberOfSamples;
 
@@ -120,34 +120,34 @@ void readAverageHumidity() {
 }
 
 void lcdStartup() {
-    lcd.begin(16,2);   // initialize the lcd for 16 chars 2 lines, turn on backlight
-  
-// ------- Quick 3 blinks of backlight  -------------
-    for(int i = 0; i< 3; i++)
+    lcd.begin(16, 2);    // initialize the lcd for 16 chars 2 lines, turn on backlight
+
+    // ------- Quick 3 blinks of backlight    -------------
+    for (int i = 0; i < 3; i++)
     {
         lcd.backlight();
         delay(250);
         lcd.noBacklight();
         delay(250);
     }
-    lcd.backlight(); // finish with backlight on  
+    lcd.backlight(); // finish with backlight on
 
-//-------- Write characters on the display ------------------
-// NOTE: Cursor Position: (CHAR, LINE) start at 0  
-    lcd.setCursor(0,0); //Start at character 4 on line 0
+    //-------- Write characters on the display ------------------
+    // NOTE: Cursor Position: (CHAR, LINE) start at 0
+    lcd.setCursor(0, 0); //Start at character 4 on line 0
     lcd.print("Hello, world!");
     delay(1000);
-    lcd.setCursor(0,1);
+    lcd.setCursor(0, 1);
     lcd.print("HI!YourDuino.com");
-    delay(8000);  
+    delay(8000);
 
-// Wait and then tell user they can start the Serial Monitor and type in characters to
-// Display. (Set Serial Monitor option to "No Line Ending")
+    // Wait and then tell user they can start the Serial Monitor and type in characters to
+    // Display. (Set Serial Monitor option to "No Line Ending")
     lcd.clear();
-    lcd.setCursor(0,0); //Start at character 0 on line 0
+    lcd.setCursor(0, 0); //Start at character 0 on line 0
     lcd.print("Use Serial Mon");
-    lcd.setCursor(0,1);
-    lcd.print("Type to display");  
+    lcd.setCursor(0, 1);
+    lcd.print("Type to display");
 }
 
 void initiatePins() {
@@ -170,16 +170,16 @@ void initiatePins() {
 
 void doPid() {
     myPID1.Compute();
-    
+
     now = millis();
     if (now - windowStartTime > windowSize) {
         windowStartTime += windowSize;
     }
 
     if (output1 > 3000) {
-      output1 = 3000;
+        output1 = 3000;
     }
-  
+
     if ((output1 > now - windowStartTime) && output1 > 100 && humidity1 > -1) {
         digitalWrite(relayPin1, HIGH);
         digitalWrite(13, HIGH);
@@ -201,8 +201,8 @@ void doPid() {
 }
 
 int read_humidity_sensor() {
-  int value = analogRead(humidity_sensor_pin);
-  //return 1023 - value;
-  return 123;
+    int value = analogRead(humidity_sensor_pin);
+    //return 1023 - value;
+    return 123;
 }
 
