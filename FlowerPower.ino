@@ -41,9 +41,18 @@ void setup() {
 }
 
 void loop() {
-    uint8_t i;
-    float averageAnalogRead_1;
+    pushButtonLogic();
+    readAverageHumidity();
+    doPid();
+    printSerialToLCD();
+}
 
+void setupAref() {
+    // connect AREF to 3.3V and use that as VCC, less noisy!
+    //analogReference(EXTERNAL);
+}
+
+void pushButtonLogic() {
     //read the pushbutton value into a variable
     int sensorVal = digitalRead(btn_pin);
     //print out the value of the pushbutton
@@ -54,28 +63,10 @@ void loop() {
     } else {
         //digitalWrite(test_led, HIGH);
     }
-   
-    // take N samples in a row, with a slight delay
-    //digitalWrite(humidity_sensor_vcc, HIGH);
-    //delay(500);
-    for (i=0; i< numberOfSamples; i++) {
-       samples1[i] = read_humidity_sensor();
-//     delay(10);
-    }
-    //digitalWrite(humidity_sensor_vcc, LOW);
-   
-    // average all the samples out
-    averageAnalogRead_1 = 0;
-    for (i=0; i< numberOfSamples; i++) {
-       averageAnalogRead_1 += samples1[i];
-    }
-    averageAnalogRead_1 /= numberOfSamples;
+}
 
-    humidity1 = averageAnalogRead_1;
-    
-    doPid();
-
-    // when characters arrive over the serial port...
+void printSerialToLCD() {
+  // when characters arrive over the serial port...
     if (Serial.available()) {
       // wait a bit for the entire message to arrive
       delay(100);
@@ -87,11 +78,6 @@ void loop() {
         lcd.write(Serial.read());
       }
     }
-}
-
-void setupAref() {
-    // connect AREF to 3.3V and use that as VCC, less noisy!
-    //analogReference(EXTERNAL);
 }
 
 void setupPid() {
@@ -108,6 +94,29 @@ void setupSerial() {
     while (!Serial);
     delay(1000);
     Serial.begin(115200);
+}
+
+void readAverageHumidity() {
+    uint8_t i;
+    float averageAnalogRead_1;
+  
+    // take N samples in a row, with a slight delay
+    //digitalWrite(humidity_sensor_vcc, HIGH);
+    //delay(500);
+    for (i=0; i< numberOfSamples; i++) {
+       samples1[i] = read_humidity_sensor();
+//     delay(10);
+    }
+    //digitalWrite(humidity_sensor_vcc, LOW);
+
+    // average all the samples out
+    averageAnalogRead_1 = 0;
+    for (i=0; i< numberOfSamples; i++) {
+       averageAnalogRead_1 += samples1[i];
+    }
+    averageAnalogRead_1 /= numberOfSamples;
+
+    humidity1 = averageAnalogRead_1;
 }
 
 void lcdStartup() {
