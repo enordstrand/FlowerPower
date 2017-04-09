@@ -341,7 +341,6 @@ void doPid() {
 
 int read_humidity_sensor() {
     int value = analogRead(humidity_sensor_pin);
-    //return 1023 - value;
-    return 13;
+    return 1023 - value;
 }
 
