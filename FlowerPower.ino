@@ -15,7 +15,7 @@ static const long windowSize = 60000;
 
 double setpoint1, input1, output1;
 double kp = 2000, ki = 0, kd = 0;
-long now, windowStartTime, lcdPreviousMillis, inactivePreviousMillis, setSPPreviousMillis, blinkPrviousMillis;
+long now, windowStartTime, lcdPreviousMillis, inactivePreviousMillis, setSPPreviousMillis, blinkPrviousMillis, nextPrviousMillis;
 long counter = 0;
 double sensorValue1 = 0;
 double meansensorValue1 = 0;
@@ -60,25 +60,61 @@ void setSP(bool buttonPushed) {
     if (!buttonPushed) {
         setSPPreviousMillis = now;
     }
-    Serial.print("Button: ");
-    Serial.print(buttonPushed);
-    Serial.print(" Now: ");
-    Serial.print(now);
-    Serial.print(" Prev: ");
-    Serial.print(setSPPreviousMillis);
-    Serial.print(" Now - prev: ");
-    Serial.println(now - setSPPreviousMillis);
+
     if (buttonPushed) {
-        if (now - setSPPreviousMillis > 3000) {
+        if (now - setSPPreviousMillis > 2000) {
             settingSP = true;
             //setSPPreviousMillis = now;
-            while(1){
-                lcd.setCursor(4, 0); //Start at character 0 on line 0
-                lcd.print("    ");
-                delay(500);
-                lcd.setCursor(4,0);
-                lcd.print(setpoint1,0);
-                delay(500);
+            bool isOn = true;
+            int blinkCursor = 0;
+            int cursorOffset = 0;
+            nextPrviousMillis = now;
+            while(settingSP){
+                now = millis();
+                bool lastButtonPushed = buttonPushed;
+                buttonPushed = isButtonPushed();
+                Serial.print("LastButtonPushed: ");
+                Serial.print(lastButtonPushed);
+                Serial.print(" ButtonPushed: ");
+                Serial.println(buttonPushed);
+                if (buttonPushed && !lastButtonPushed) {
+                    Serial.println("In");
+                    setpoint1 += pow(10,2-blinkCursor);
+                    if (setpoint1 / 1000 >= 1) {
+                        setpoint1 -= 1000;
+                    }
+                    nextPrviousMillis = now;
+                    blinkPrviousMillis = now;
+                    isOn = false;
+                }
+                
+                if (now - nextPrviousMillis > 5000) {
+                    nextPrviousMillis = now;
+                    blinkCursor += 1;
+                    if (blinkCursor > 2) {
+                        settingSP = false;
+                    }
+                }
+
+                if (now - blinkPrviousMillis > 500) {
+                    blinkPrviousMillis = now;
+                    if (isOn) {
+                        lcd.setCursor(4+blinkCursor, 0);
+                        lcd.print(" ");
+                        isOn = false;
+                    } else {
+                        if (setpoint1 < 100) {
+                            lcd.setCursor(4, 0);
+                            lcd.print(0);
+                            cursorOffset = 1;
+                        } else {
+                            cursorOffset = 0;
+                        }
+                        lcd.setCursor(4+cursorOffset, 0);
+                        lcd.print(setpoint1,0);
+                        isOn = true;
+                    }
+                }
             }
         }
     }    
@@ -88,14 +124,7 @@ void screenSaver(bool buttonPushed) {
     if (buttonPushed) {
         inactivePreviousMillis = now;
     }
-    /*Serial.print("Button: ");
-    Serial.print(buttonPushed);
-    Serial.print(" Now: ");
-    Serial.print(now);
-    Serial.print(" Prev: ");
-    Serial.print(inactivePreviousMillis);
-    Serial.print(" Now - prev: ");
-    Serial.println(now - inactivePreviousMillis);*/
+
     if (now - inactivePreviousMillis > 60000) {
         lcd.noBacklight();
     } else {
