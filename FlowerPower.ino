@@ -68,21 +68,32 @@ void setSP(bool buttonPushed) {
             bool isOn = true;
             int blinkCursor = 0;
             int cursorOffset = 0;
+            int intSetpoint1;
             nextPrviousMillis = now;
             while(settingSP){
                 now = millis();
                 bool lastButtonPushed = buttonPushed;
                 buttonPushed = isButtonPushed();
-                Serial.print("LastButtonPushed: ");
-                Serial.print(lastButtonPushed);
-                Serial.print(" ButtonPushed: ");
-                Serial.println(buttonPushed);
                 if (buttonPushed && !lastButtonPushed) {
-                    Serial.println("In");
                     setpoint1 += pow(10,2-blinkCursor);
-                    if (setpoint1 / 1000 >= 1) {
-                        setpoint1 -= 1000;
+                    intSetpoint1 = 0.5+setpoint1;
+                    Serial.print(setpoint1);
+                    Serial.print(" : ");
+                    Serial.print(intSetpoint1);
+                    Serial.print(" % ");
+                    Serial.print(tenToThePowerOf(3-blinkCursor));
+                    Serial.print(" = ");
+                    Serial.print(intSetpoint1 % tenToThePowerOf(3));
+                    Serial.print(" < ");
+                    Serial.println(tenToThePowerOf(3-1-blinkCursor));
+                    if (intSetpoint1 % tenToThePowerOf(3-blinkCursor) < tenToThePowerOf(3-1-blinkCursor)) {
+                        setpoint1 -= tenToThePowerOf(3-blinkCursor);
+                        if (setpoint1 < 0) {
+                            setpoint1 = 0;
+                        }
                     }
+                    Serial.print("Post setPoint: ");
+                    Serial.println(setpoint1);
                     nextPrviousMillis = now;
                     blinkPrviousMillis = now;
                     isOn = false;
@@ -103,13 +114,21 @@ void setSP(bool buttonPushed) {
                         lcd.print(" ");
                         isOn = false;
                     } else {
-                        if (setpoint1 < 100) {
+                        if (setpoint1 < 10) {
+                            lcd.setCursor(4, 0);
+                            lcd.print("00");
+                            cursorOffset = 2;
+                        } else if (setpoint1 < 100) {
                             lcd.setCursor(4, 0);
                             lcd.print(0);
                             cursorOffset = 1;
                         } else {
                             cursorOffset = 0;
                         }
+                        Serial.print("Cursor: ");
+                        Serial.print(4+cursorOffset);
+                        Serial.print(" Setpoint: ");
+                        Serial.println(setpoint1);
                         lcd.setCursor(4+cursorOffset, 0);
                         lcd.print(setpoint1,0);
                         isOn = true;
@@ -118,6 +137,14 @@ void setSP(bool buttonPushed) {
             }
         }
     }    
+}
+
+int tenToThePowerOf(int p) {
+    int sum = 1;
+    for (int i = 0; i < p; i++) {
+        sum *= 10;
+    }
+    return sum;
 }
 
 void screenSaver(bool buttonPushed) {
